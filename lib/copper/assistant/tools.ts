@@ -46,6 +46,16 @@ export type CostBreakdown = {
 
 export type CheckAvailabilityInput = { product: ProductId; color?: string };
 
+export type FeaturesInput = { product?: ProductId };
+
+export type Features = {
+  products: {
+    id: ProductId;
+    name: string;
+    features: { name: string; description: string }[];
+  }[];
+};
+
 export type Stock = "in_stock" | "low_stock" | "backordered";
 
 export type Availability =
@@ -185,6 +195,19 @@ export async function checkAvailability(
   return { status: "ok", product: product.name, colors };
 }
 
+export const listFeaturesInput: z.ZodType<FeaturesInput> = z.object({
+  product: z.enum(productIds).optional(),
+});
+
+/** get_features: what each product can do, read from the catalog. */
+export function listFeatures(input: FeaturesInput = {}): Features {
+  return {
+    products: getProducts()
+      .filter((product) => !input.product || product.id === input.product)
+      .map(({ id, name, features }) => ({ id, name, features })),
+  };
+}
+
 export const copperTools: ToolSet = {
   get_products: tool({
     description:
@@ -203,6 +226,12 @@ export const copperTools: ToolSet = {
       "Work out the total cost of up to 5 devices plus a plan over 1 to 5 years; Copper Plus is counted once per household.",
     inputSchema: calculateCostInput,
     execute: async (input) => calculateCost(input),
+  }),
+  get_features: tool({
+    description:
+      "List what Copper Home and Copper Notes can do, like Monsoon Mode or Meeting Mode, for one product or for both.",
+    inputSchema: listFeaturesInput,
+    execute: async (input) => listFeatures(input),
   }),
   check_availability: tool({
     description:

@@ -60,6 +60,16 @@ function inputRows(step: ToolStep): Row[] {
       { label: "Years", value: String(input.years) },
     ];
   }
+  if (step.name === "get_features") {
+    return [
+      {
+        label: "Product",
+        value: input.product
+          ? (PRODUCT_NAMES[String(input.product)] ?? String(input.product))
+          : "All products",
+      },
+    ];
+  }
   if (step.name === "check_availability") {
     return [
       {
@@ -197,6 +207,35 @@ function Result({ step }: { step: ToolStep }) {
               </div>
             ),
           )}
+      </div>
+    );
+  }
+
+  if (step.name === "get_features") {
+    return (
+      <div className="space-y-2 text-sm">
+        {(data.products ?? []).map(
+          (p: {
+            id: string;
+            name: string;
+            features: { name: string; description: string }[];
+          }) => (
+            <div key={p.id}>
+              <div className="font-medium">{p.name}</div>
+              <ul className="mt-1 space-y-0.5">
+                {p.features.map((feature) => (
+                  <li key={feature.name}>
+                    <span className="font-medium">{feature.name}</span>
+                    <span className="text-muted-foreground">
+                      {" "}
+                      · {feature.description}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ),
+        )}
       </div>
     );
   }
