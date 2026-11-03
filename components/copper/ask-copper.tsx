@@ -33,6 +33,8 @@ const STARTERS = [
   "How much is Copper Home with Copper Plus, paid yearly, for 2 years?",
   "Is Copper Notes in Night Sky in stock?",
   "Is Copper Plus cheaper monthly or yearly?",
+  // Added for the extension: asking it makes Copper use get_features.
+  "What can Copper Notes do?",
 ];
 
 type Turn = { question: string; progress: Progress | null };
